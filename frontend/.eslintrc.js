@@ -5,8 +5,6 @@ module.exports = {
     'plugin:prettier/recommended',
     'prettier/react',
   ],
-  parser: 'babel-eslint',
-  plugins: ['babel'],
   rules: {
     quotes: ['error', 'single'],
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,

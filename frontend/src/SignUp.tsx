@@ -1,16 +1,16 @@
-import React, { SyntheticEvent, useCallback, useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import { GithubLoginButton } from "react-social-login-buttons";
+import React, { SyntheticEvent, useCallback, useState } from 'react'
+import Avatar from '@material-ui/core/Avatar'
+import Button from '@material-ui/core/Button'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import TextField from '@material-ui/core/TextField'
+import Link from '@material-ui/core/Link'
+import Grid from '@material-ui/core/Grid'
+import Box from '@material-ui/core/Box'
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import Container from '@material-ui/core/Container'
+import { GithubLoginButton } from 'react-social-login-buttons'
 import firebase from './utils/firebase'
 
 const useStyles = makeStyles(theme => ({
@@ -46,9 +46,9 @@ const useStyles = makeStyles(theme => ({
 
   githubText: {
     fontSize: '14px !important',
-    fontWeight: 'bold'
-  }
-}));
+    fontWeight: 'bold',
+  },
+}))
 
 type State = {
   email: string
@@ -61,31 +61,33 @@ const initialState = {
 }
 
 const SignUp: React.FC = () => {
-  const classes = useStyles();
+  const classes = useStyles()
   const [state, setState] = useState<State>(initialState)
 
-  const handleSignUpGithub = useCallback(() => {}, [])
-
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const name = e.target.name
+    const value = e.target.value
     setState(s => ({ ...s, [name]: value }))
   }, [])
 
-  const handleSubmit = useCallback(async (e: SyntheticEvent) => {
-    e.preventDefault()
+  const handleSubmit = useCallback(
+    async (e: SyntheticEvent) => {
+      e.preventDefault()
 
-    const { email, password } = state
+      const { email, password } = state
 
-    try {
-      const res = await firebase.auth().createUserWithEmailAndPassword(email, password)
-      console.log('res: ', res)
-    } catch (e) {
-      // error handling
-      console.error(e)
-    }
-
-  }, [state])
+      try {
+        const res = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password)
+        console.log('res: ', res)
+      } catch (e) {
+        // error handling
+        console.error(e)
+      }
+    },
+    [state],
+  )
 
   return (
     <Container component="main" maxWidth="xs">
@@ -97,7 +99,11 @@ const SignUp: React.FC = () => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate autoComplete="off" onSubmit={handleSubmit}>
+        <form
+          className={classes.form}
+          noValidate
+          autoComplete="off"
+          onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -133,8 +139,7 @@ const SignUp: React.FC = () => {
             fullWidth
             variant="contained"
             color="primary"
-            className={classes.submit}
-          >
+            className={classes.submit}>
             Sign Up
           </Button>
 
@@ -145,7 +150,7 @@ const SignUp: React.FC = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <GithubLoginButton onClick={handleSignUpGithub} className={classes.github}>
+            <GithubLoginButton className={classes.github}>
               <span className={classes.githubText}>Sign up with Github</span>
             </GithubLoginButton>
           </Grid>
@@ -170,7 +175,7 @@ const SignUp: React.FC = () => {
         </Typography>
       </Box>
     </Container>
-  );
+  )
 }
 
 export default SignUp
