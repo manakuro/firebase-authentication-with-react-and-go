@@ -12,6 +12,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { GithubLoginButton } from 'react-social-login-buttons'
 import firebase from './utils/firebase'
+import { API_URL } from './const'
+import api from './api'
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -60,19 +62,48 @@ const initialState = {
   password: '',
 }
 
+type User = {
+  id: string
+  uuid: string
+  name: string
+  email: string
+  createdAt: string
+  updatedAt: string
+  deletedAt: string
+}
+
 const SignUp: React.FC = () => {
   const classes = useStyles()
   const [state, setState] = useState<State>(initialState)
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async user => {
       if (user) {
-        // user signed in
+        console.log('user: ', await user.getIdToken())
       } else {
         // user not signed in
       }
     })
   }, [])
+
+  const createUser = useCallback(
+    async (params: { email: string | null; uuid: string }) => {
+      return await api.post<User>(`${API_URL}/api/users`, params)
+    },
+    [],
+  )
+
+  const setAPIToToken = useCallback(
+    async (fb: firebase.auth.UserCredential) => {
+      const idToken = await fb.user?.getIdToken()
+      if (!idToken) {
+        console.warn('[Firebase error]: idToken is not provided')
+        return
+      }
+      api.setToken(idToken)
+    },
+    [],
+  )
 
   const handleSignUpWithGitHub = useCallback(async () => {
     const provider = new firebase.auth.GithubAuthProvider()
@@ -84,12 +115,23 @@ const SignUp: React.FC = () => {
         ? await currentUser.linkWithPopup(provider)
         : await firebase.auth().signInWithPopup(provider)
 
-      console.log('res: ', res)
+      await setAPIToToken(res)
+
+      if (!currentUser) {
+        const firebaseUser = res.user as firebase.User
+        const user = await createUser({
+          email: firebaseUser.email,
+          uuid: firebaseUser.uid,
+        })
+        console.log('user: ', user)
+      } else {
+        // maybe get user through API
+      }
     } catch (err) {
       // error handling
       console.error(err)
     }
-  }, [])
+  }, [createUser, setAPIToToken])
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name
@@ -107,13 +149,21 @@ const SignUp: React.FC = () => {
         const res = await firebase
           .auth()
           .createUserWithEmailAndPassword(email, password)
-        console.log('res: ', res)
+
+        await setAPIToToken(res)
+
+        const firebaseUser = res.user as firebase.User
+        const user = await createUser({
+          email: firebaseUser.email,
+          uuid: firebaseUser.uid,
+        })
+        console.log('user: ', user)
       } catch (e) {
         // error handling
         console.error(e)
       }
     },
-    [state],
+    [createUser, setAPIToToken, state],
   )
 
   return (
