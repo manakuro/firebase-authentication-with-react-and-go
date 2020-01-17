@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useState } from 'react'
+import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -63,6 +63,33 @@ const initialState = {
 const SignUp: React.FC = () => {
   const classes = useStyles()
   const [state, setState] = useState<State>(initialState)
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // user signed in
+      } else {
+        // user not signed in
+      }
+    })
+  }, [])
+
+  const handleSignUpWithGitHub = useCallback(async () => {
+    const provider = new firebase.auth.GithubAuthProvider()
+
+    try {
+      const currentUser = await firebase.auth().currentUser
+
+      const res = currentUser
+        ? await currentUser.linkWithPopup(provider)
+        : await firebase.auth().signInWithPopup(provider)
+
+      console.log('res: ', res)
+    } catch (err) {
+      // error handling
+      console.error(err)
+    }
+  }, [])
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name
@@ -150,7 +177,9 @@ const SignUp: React.FC = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <GithubLoginButton className={classes.github}>
+            <GithubLoginButton
+              className={classes.github}
+              onClick={handleSignUpWithGitHub}>
               <span className={classes.githubText}>Sign up with Github</span>
             </GithubLoginButton>
           </Grid>
