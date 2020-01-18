@@ -17,6 +17,7 @@ $ docker-compose up
 #### Install
 
 ```
+$ cd frontend
 $ yarn 
 ```
 
