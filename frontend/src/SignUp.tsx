@@ -79,7 +79,7 @@ const SignUp: React.FC = () => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged(async user => {
       if (user) {
-        console.log('user: ', await user.getIdToken())
+        // user signed in
       } else {
         // user not signed in
       }
